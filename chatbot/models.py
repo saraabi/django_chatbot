@@ -12,6 +12,7 @@ class UserProfile(models.Model):
     uuid = models.UUIDField(db_index=True, 
         default=uuid_lib.uuid4, editable=False)
     user = models.OneToOneField(User, on_delete=models.CASCADE)
+    
 
     @receiver(post_save, sender=User)
     def create_user_profile(sender, instance, created, **kwargs):
