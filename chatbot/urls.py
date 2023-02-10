@@ -7,5 +7,5 @@ from .views import Home, CreateAnswer, Chat
 urlpatterns = [
     path('', Home.as_view(), name='home'),
     path('answer', CreateAnswer.as_view(), name='create_answer'),
-    path('chat/<pk>', Chat.as_view(), name='chat'),
+    path('chat/<pk>/', Chat.as_view(), name='chat'),
 ]
