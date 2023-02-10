@@ -12,7 +12,7 @@ class UserProfile(models.Model):
     uuid = models.UUIDField(db_index=True, 
         default=uuid_lib.uuid4, editable=False)
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    
+    prompt = models.TextField(blank=True)
 
     @receiver(post_save, sender=User)
     def create_user_profile(sender, instance, created, **kwargs):
@@ -29,6 +29,13 @@ class Question(models.Model):
 
     name = models.CharField(max_length=255)
     description = models.TextField(blank=True)
+    user = models.ForeignKey(UserProfile, 
+        on_delete=models.SET_NULL, blank=True, null=True)
+    timestamp = models.DateTimeField(auto_now_add=True)
+    is_training = models.BooleanField(default=False)
+
+    class Meta:
+        ordering = ('timestamp',)
 
     def __str__(self):
         return self.name
@@ -38,8 +45,13 @@ class Answer(models.Model):
     question = models.ForeignKey(Question, 
         on_delete=models.CASCADE)
     text = models.TextField(blank=True)
-    respondent = models.ForeignKey(UserProfile, 
+    user = models.ForeignKey(UserProfile, 
         on_delete=models.CASCADE)
+    timestamp = models.DateTimeField(auto_now_add=True)
     
+
+    class Meta:
+        ordering = ('timestamp',)    
+
     def __str__(self):
         return 'Response to {}'.format(self.question.name)

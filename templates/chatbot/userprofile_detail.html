@@ -5,4 +5,11 @@
 <input type="text" name="question">
 <input type="submit" value="Submit">
 </form>
+<p>Log</p>
+{% for question in userprofile.question_set.all %}
+    <p><em>{{ question.timestamp }}</em> Question: {{ question.name }}</p>
+    {% for answer in question.answer_set.all %}
+    <p><em>{{ answer.timestamp }}</em> Answer: {{ answer.text }}</p>
+    {% endfor %}
+{% endfor %}
 {% endblock %}
