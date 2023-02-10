@@ -21,22 +21,32 @@ class CreateAnswer(CreateView):
 
 class Chat(DetailView):
     model = UserProfile
+    template_name = 'chatbot/userprofile_detail.html'
 
     def post(self, request, **kwargs):
         openai.api_key = settings.OPENAI_API_KEY
         self.object = self.get_object()
+        print(self.object)
         context = super().get_context_data(**kwargs)
-        print(request.POST['question'])
-        
+        question = Question.objects.create(
+            name=request.POST['question'],
+            user=context['userprofile'],
+        )
         answer, prompt = self.gpt3(prompt=request.POST['question'])
         context['answer'] = answer
         context['prompt'] = prompt
+        answer = Answer.objects.create(
+            question=question,
+            text=answer,
+            user=context['userprofile'],
+        )
+        print(context) 
         return render(request, self.template_name, context)
 
 
     def gpt3(self, prompt, engine='davinci', response_length=64, 
-        temperature=0.7, top_p=1, frequency_penalty=0, presence_penalty=0, 
-        start_text='', restart_text='', stop_seq=["\nHuman:", "\n"]):
+        temperature=0.9, top_p=1, frequency_penalty=1, presence_penalty=1, 
+        start_text='\nAI:', restart_text='\nHuman: ', stop_seq=["\nHuman:", "\n"]):
         openai.api_key = settings.OPENAI_API_KEY
         print('here')
         print(prompt)
