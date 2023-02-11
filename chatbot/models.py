@@ -12,6 +12,7 @@ class UserProfile(models.Model):
     uuid = models.UUIDField(db_index=True, 
         default=uuid_lib.uuid4, editable=False)
     user = models.OneToOneField(User, on_delete=models.CASCADE)
+    description = models.CharField(max_length=255, blank=True)
     prompt = models.TextField(blank=True)
 
     @receiver(post_save, sender=User)
@@ -49,9 +50,8 @@ class Answer(models.Model):
         on_delete=models.CASCADE)
     timestamp = models.DateTimeField(auto_now_add=True)
     
+    def __str__(self):
+        return 'Response to {}'.format(self.question.name)
 
     class Meta:
         ordering = ('timestamp',)    
-
-    def __str__(self):
-        return 'Response to {}'.format(self.question.name)

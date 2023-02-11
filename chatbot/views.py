@@ -3,18 +3,32 @@ import openai
 import urllib
 
 from django.conf import settings
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
-from django.shortcuts import render
+from django.shortcuts import redirect, render
+from django.urls import reverse, reverse_lazy
 from django.views.generic import DetailView, ListView
 from django.views.generic.edit import CreateView
+
 
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Submit, Layout
 
 from .models import Question, Answer, UserProfile
 
-class Home(ListView):
-    model = Answer
+class Home(LoginRequiredMixin, DetailView):
+    model = UserProfile
+    template_name = 'home.html'
+
+    def get_object(self):
+        return self.request.user.userprofile
+    
+    def post(self, request, **kwargs):
+        userprofile = self.get_object()
+        userprofile.description = request.POST.get('description')
+        userprofile.save()
+        return redirect(reverse('home'))
+
 
 class CreateAnswer(CreateView):
     model = Answer
@@ -26,7 +40,6 @@ class Chat(DetailView):
     def post(self, request, **kwargs):
         openai.api_key = settings.OPENAI_API_KEY
         self.object = self.get_object()
-        print(self.object)
         context = super().get_context_data(**kwargs)
         question = Question.objects.create(
             name=request.POST['question'],
@@ -41,18 +54,26 @@ class Chat(DetailView):
             user=context['userprofile'],
         )
         print(context) 
-        return render(request, self.template_name, context)
+        return redirect(reverse('home'))
+        # return render(request, self.template_name, context)
 
 
-    def gpt3(self, prompt, engine='davinci', response_length=64, 
+    def gpt3(self, prompt, model='text-davinci-003', response_length=512, 
         temperature=0.9, top_p=1, frequency_penalty=1, presence_penalty=1, 
         start_text='\nAI:', restart_text='\nHuman: ', stop_seq=["\nHuman:", "\n"]):
         openai.api_key = settings.OPENAI_API_KEY
-        print('here')
+        if self.get_object().description:
+            description = self.get_object().description
+        else:
+            description = "friendly AI assistant chatbot."
+        
+        prompt = """The following is a conversation with an AI assistant.\nHuman: Who are you?
+            AI: I am {0}
+            Human: {1}""".format(description, prompt)
         print(prompt)
         response = openai.Completion.create(
             prompt=prompt + start_text,
-            engine=engine,
+            model=model,
             max_tokens=response_length,
             temperature=temperature,
             top_p=top_p,

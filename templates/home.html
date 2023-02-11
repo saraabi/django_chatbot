@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+<h1>ChatBot</h1>
+<div class="card mx-auto mt-5 p-4">
+    <form class="Form mt-4" action="" method="POST">
+        {% csrf_token %}
+        <p>Write a one sentence description of your chatbot's personality</p>
+        <div class="form-group">
+        <label>My AI assistant is:</label>
+        <input class="textinput textInput form-control" type="text" name="description" {% if userprofile.description %}value="{{ userprofile.description }}"{% endif %}>
+        <input type="submit" value="Submit" class="btn btn-primary">
+    </form>
+</div>
+<p>Conversation</p>
+{% for question in userprofile.question_set.all %}
+    <p><em>{{ question.timestamp }}</em> Question: {{ question.name }}</p>
+    {% for answer in question.answer_set.all %}
+    <p><em>{{ answer.timestamp }}</em> Answer: {{ answer.text }}</p>
+    {% endfor %}
+{% endfor %}
+<form class="Form mt-4" action="{% url 'chat' pk=userprofile.id %}" method="POST">
+    {% csrf_token %}
+    
+    <div class="form-group">
+    <input class="textinput textInput form-control"  type="text" name="question">
+    <input type="submit" value="Submit" class="btn btn-primary">
+</form>
+{% endblock %}
