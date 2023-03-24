@@ -12,7 +12,8 @@ class UserProfile(models.Model):
     uuid = models.UUIDField(db_index=True, 
         default=uuid_lib.uuid4, editable=False)
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    description = models.CharField(max_length=255, blank=True)
+    description = models.CharField(max_length=255, blank=True,
+        default='a friendly AI assistant')
     prompt = models.TextField(blank=True)
 
     @receiver(post_save, sender=User)
@@ -25,6 +26,18 @@ class UserProfile(models.Model):
 
     def get_display_name(self):
         return self.user.get_full_name()
+
+    def build_prompt(self):
+        prompt = """The following is a conversation with an \
+            AI assistant.\nHuman: Who are you?
+            AI: I am {0}""".format(self.description)
+        for answer in self.answer_set.all():
+            prompt += """
+                Human: {0}
+                AI: {1}""".format(answer.question.name,
+                    answer.text)
+        return prompt
+
 
 class Question(models.Model):
 

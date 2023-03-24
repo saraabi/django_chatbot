@@ -67,9 +67,11 @@ class Chat(DetailView):
         else:
             description = "friendly AI assistant chatbot."
         
-        prompt = """The following is a conversation with an AI assistant.\nHuman: Who are you?
-            AI: I am {0}
-            Human: {1}""".format(description, prompt)
+        # prompt = """The following is a conversation with an AI assistant.\nHuman: Who are you?
+        #     AI: I am {0}
+        #     Human: {1}""".format(description, prompt)
+        # print(prompt)
+        prompt = self.get_object().build_prompt()
         print(prompt)
         response = openai.Completion.create(
             prompt=prompt + start_text,

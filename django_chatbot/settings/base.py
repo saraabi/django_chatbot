@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.sites',
     'django.contrib.staticfiles',
+    'django_extensions',
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
@@ -131,14 +132,16 @@ SOCIALACCOUNT_PROVIDERS = {
     'google': {
         'SCOPE': [
             'profile', 'email',
-            'https://www.googleapis.com/auth/drive',
-            'https://www.googleapis.com/auth/tables',
+            'https://www.googleapis.com/auth/gmail.modify',
         ],
         'AUTH_PARAMS': {
             'access_type': 'offline',
-        }
+        },
+        'OAUTH_PKCE_ENABLED': True,
     }
 }
+
+SOCIALACCOUNT_STORE_TOKENS = True
 
 MAX_CONN_AGE = 600
 
