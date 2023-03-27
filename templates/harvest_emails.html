@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+<h1>ChatBot</h1>
+<div class="card mx-auto mt-5 p-4">
+    {% for thread in emails %}
+    <table class="table">
+        <thead>
+          <tr>
+            <th scope="col"></th>
+            <th scope="col">Date</th>
+            <th scope="col">From</th>
+            <th scope="col">Subject</th>
+          </tr>
+        </thead>
+        <tbody>
+            {% for email in thread %}
+          <tr>
+            <th scope="row"><input type="checkbox" value="{{ email.id }}"></th>
+            <td>{{ email.date }}</td>
+            <td>{{ email.from }}</td>
+            <td>{{ email.subject }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+    </table>
+    {% endfor %}
+
+</div>
+
+{% endblock %}

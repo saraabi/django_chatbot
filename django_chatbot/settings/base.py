@@ -179,4 +179,4 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 OPENAI_API_KEY = get_env_variable('OPENAI_API_KEY')
 
-LOGIN_REDIRECT_URL = '/'
+LOGIN_REDIRECT_URL = 'harvest_emails'
